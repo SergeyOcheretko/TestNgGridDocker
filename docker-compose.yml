@@ -1,0 +1,39 @@
+version: "3"
+services:
+  selenium-hub:
+    image: selenium/hub:4.12.1
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+    environment:
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_GRID_MAX_SESSION=4          # общий лимит сетки
+      - SE_GRID_BROWSER_TIMEOUT=300
+      - SE_GRID_TIMEOUT=300
+
+  chrome:
+    image: selenium/node-chrome:4.12.1
+    container_name: chrome-node
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=1       # 2 одновременных сессии Chrome
+
+  firefox:
+    image: selenium/node-firefox:4.12.1
+    container_name: firefox-node
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=1       # 2 одновременных сессии Firefox

@@ -1,0 +1,12 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.1.dtd">
+<suite name="Parallel-test" parallel="tests" thread-count="2">
+    <test name="ChromeTest">
+        <parameter name="browserName" value="chrome"/>
+        <classes><class name="UiTests.tests.auth.ForgotPasswordTests"/></classes>
+    </test>
+
+    <test name="FirefoxTest">
+        <parameter name="browserName" value="firefox"/>
+        <classes><class name="UiTests.tests.auth.ForgotPasswordTests"/></classes>
+    </test>
+</suite>
