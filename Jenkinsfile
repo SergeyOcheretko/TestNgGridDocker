@@ -17,7 +17,7 @@ pipeline {
       steps {
         echo '🚀 Starting Selenium Grid via Docker Compose...'
         bat 'docker-compose -f docker-compose.yml up -d'
-        bat 'ping -n 16 127.0.0.1 > nul' // ~15s pause for node registration
+        bat 'ping -n 40 127.0.0.1 > nul' // ~40s pause for node registration
         bat 'curl -s http://localhost:4444/status'
       }
     }
