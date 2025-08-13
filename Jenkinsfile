@@ -23,7 +23,7 @@ pipeline {
         echo '🚀 Starting Selenium Grid via Docker Compose...'
         bat 'docker-compose -f docker-compose.yml down || exit 0'
         bat 'docker-compose -f docker-compose.yml up -d'
-        bat 'ping -n 16 127.0.0.1 > nul' // Windows sleep
+        bat 'ping -n 16 127.0.0.1 > nul' // Windows sleep ~15s
         bat 'curl -s http://localhost:4444/status'
       }
     }
@@ -31,7 +31,13 @@ pipeline {
     stage('Run Tests') {
       steps {
         echo '🧪 Cleaning previous Allure results...'
-        bat 'rmdir /s /q build\\allure-results'
+        bat '''
+          if exist build\\allure-results (
+            rmdir /s /q build\\allure-results
+          ) else (
+            echo "📁 No previous allure-results to delete"
+          )
+        '''
 
         echo '🧪 Running UI tests...'
         bat './gradlew clean test -Dselenium.grid.url=%GRID_URL%'
