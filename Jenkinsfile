@@ -9,6 +9,7 @@ pipeline {
     stage('Start Selenium Grid') {
       steps {
         echo '🚀 Starting Selenium Grid via Docker Compose...'
+        bat 'docker-compose -f docker-compose.yml down || exit 0'
         bat 'docker-compose -f docker-compose.yml up -d'
         bat 'sleep 15' // дать время на регистрацию нод
         bat 'curl -s http://localhost:4444/status | jq .' // проверка Grid
