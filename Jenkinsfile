@@ -40,7 +40,7 @@ pipeline {
         '''
 
         echo '🧪 Running UI tests...'
-        bat 'gradlew.bat clean test -Dselenium.grid.url=%GRID_URL%'
+        bat 'mvn clean test -Dselenium.grid.url=%GRID_URL%'
       }
     }
 
