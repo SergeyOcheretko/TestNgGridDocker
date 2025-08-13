@@ -9,16 +9,16 @@ pipeline {
     stage('Start Selenium Grid') {
       steps {
         echo '🚀 Starting Selenium Grid via Docker Compose...'
-        sh 'docker-compose -f docker-compose.yml up -d'
-        sh 'sleep 15' // дать время на регистрацию нод
-        sh 'curl -s http://localhost:4444/status | jq .' // проверка Grid
+        bat 'docker-compose -f docker-compose.yml up -d'
+        bat 'sleep 15' // дать время на регистрацию нод
+        bat 'curl -s http://localhost:4444/status | jq .' // проверка Grid
       }
     }
 
     stage('Run Tests') {
       steps {
         echo '🧪 Running UI tests...'
-        sh './gradlew clean test -Dselenium.grid.url=$GRID_URL'
+        bat './gradlew clean test -Dselenium.grid.url=$GRID_URL'
       }
     }
 
@@ -32,7 +32,7 @@ pipeline {
     stage('Stop Selenium Grid') {
       steps {
         echo '🧹 Shutting down Selenium Grid...'
-        sh 'docker-compose -f docker-compose.yml down'
+        bat 'docker-compose -f docker-compose.yml down'
       }
     }
   }
