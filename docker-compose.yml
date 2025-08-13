@@ -10,9 +10,11 @@ services:
     environment:
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_GRID_MAX_SESSION=4          # общий лимит сетки
+      - SE_GRID_MAX_SESSION=4
       - SE_GRID_BROWSER_TIMEOUT=300
       - SE_GRID_TIMEOUT=300
+    networks:
+      - selenium-grid
 
   chrome:
     image: selenium/node-chrome:4.12.1
@@ -24,7 +26,9 @@ services:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_MAX_SESSIONS=1       # 2 одновременных сессии Chrome
+      - SE_NODE_MAX_SESSIONS=1
+    networks:
+      - selenium-grid
 
   firefox:
     image: selenium/node-firefox:4.12.1
@@ -36,4 +40,10 @@ services:
       - SE_EVENT_BUS_HOST=selenium-hub
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
-      - SE_NODE_MAX_SESSIONS=1       # 2 одновременных сессии Firefox
+      - SE_NODE_MAX_SESSIONS=1
+    networks:
+      - selenium-grid
+
+networks:
+  selenium-grid:
+    driver: bridge
