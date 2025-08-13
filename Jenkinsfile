@@ -23,7 +23,7 @@ pipeline {
         echo '🚀 Starting Selenium Grid via Docker Compose...'
         bat 'docker-compose -f docker-compose.yml down || exit 0'
         bat 'docker-compose -f docker-compose.yml up -d'
-        bat 'timeout /t 15 /nobreak' // Windows sleep
+        bat 'ping -n 16 127.0.0.1 > nul' // Windows sleep
         bat 'curl -s http://localhost:4444/status'
       }
     }
