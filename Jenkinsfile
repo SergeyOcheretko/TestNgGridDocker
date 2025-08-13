@@ -6,6 +6,19 @@ pipeline {
   }
 
   stages {
+    stage('Force Kill Containers') {
+      steps {
+        echo '🔪 Killing stuck Selenium Grid containers...'
+        bat '''
+          docker kill chrome-node || echo "No chrome-node to kill"
+          docker kill firefox-node || echo "No firefox-node to kill"
+          docker rm -f chrome-node || echo "Removed chrome-node"
+          docker rm -f firefox-node || echo "Removed firefox-node"
+          docker rm -f selenium-hub || echo "Removed selenium-hub"
+        '''
+      }
+    }
+
     stage('Clean Previous Containers') {
       steps {
         echo '🧹 Removing old Selenium Grid containers and network...'
@@ -18,7 +31,18 @@ pipeline {
         echo '🚀 Starting Selenium Grid via Docker Compose...'
         bat 'docker-compose -f docker-compose.yml up -d'
         bat 'ping -n 40 127.0.0.1 > nul' // ~40s pause for node registration
-        bat 'curl -s http://localhost:4444/status'
+
+        echo '🔍 Checking Grid status...'
+        bat '''
+          curl -s http://localhost:4444/status > grid-status.json
+          findstr /C:"\"ready\": true" grid-status.json > nul
+          if errorlevel 1 (
+            echo "❌ Grid is not ready"
+            exit /b 1
+          ) else (
+            echo "✅ Grid is ready"
+          )
+        '''
       }
     }
 
