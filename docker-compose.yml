@@ -54,21 +54,17 @@ services:
       - selenium-grid
 
   jenkins:
-    image: jenkins/jenkins:lts
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: jenkins
     ports:
       - "8080:8080"
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - jenkins_home:/var/jenkins_home
     depends_on:
       selenium-hub:
         condition: service_healthy
     networks:
       - selenium-grid
-
-networks:
-  selenium-grid:
-    driver: bridge
-
-volumes:
-  jenkins_home:
