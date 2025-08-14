@@ -1,5 +1,5 @@
 pipeline {
-  agent { label 'windows' }
+  agent any
 
   environment {
     GRID_URL = "http://localhost:4444/wd/hub"
@@ -9,7 +9,7 @@ pipeline {
     stage('Force Kill Containers') {
       steps {
         echo '🔪 Killing stuck Selenium Grid containers...'
-        bat '''
+        sh '''
           docker kill chrome-node || echo "No chrome-node to kill"
           docker kill firefox-node || echo "No firefox-node to kill"
           docker rm -f chrome-node || echo "Removed chrome-node"
@@ -22,26 +22,26 @@ pipeline {
     stage('Clean Previous Containers') {
       steps {
         echo '🧹 Removing old Selenium Grid containers and network...'
-        bat 'docker-compose -f docker-compose.yml down --remove-orphans || exit 0'
+        sh 'docker-compose -f docker-compose.yml down --remove-orphans || true'
       }
     }
 
     stage('Start Selenium Grid') {
       steps {
         echo '🚀 Starting Selenium Grid via Docker Compose...'
-        bat 'docker-compose -f docker-compose.yml up -d'
-        bat 'ping -n 40 127.0.0.1 > nul' // ~40s pause for node registration
+        sh 'docker-compose -f docker-compose.yml up -d'
+        echo '⏳ Waiting for node registration...'
+        sh 'sleep 40'
 
         echo '🔍 Checking Grid status...'
-        bat '''
+        sh '''
           curl -s http://localhost:4444/status > grid-status.json
-          findstr /C:"\"ready\": true" grid-status.json > nul
-          if errorlevel 1 (
+          if ! grep -q '"ready": true' grid-status.json; then
             echo "❌ Grid is not ready"
-            exit /b 1
-          ) else (
+            exit 1
+          else
             echo "✅ Grid is ready"
-          )
+          fi
         '''
       }
     }
@@ -49,16 +49,16 @@ pipeline {
     stage('Run Tests') {
       steps {
         echo '🧪 Cleaning previous Allure results...'
-        bat '''
-          if exist allure-results (
-            rmdir /s /q allure-results
-          ) else (
+        sh '''
+          if [ -d allure-results ]; then
+            rm -rf allure-results
+          else
             echo "📁 No previous allure-results to delete"
-          )
+          fi
         '''
 
         echo '🧪 Running UI tests with Maven...'
-        bat 'mvn clean test -Dselenium.grid.url=%GRID_URL%'
+        sh 'mvn clean test -Dselenium.grid.url=$GRID_URL'
       }
     }
 
@@ -72,7 +72,7 @@ pipeline {
     stage('Stop Selenium Grid') {
       steps {
         echo '🧹 Shutting down Selenium Grid...'
-        bat 'docker-compose -f docker-compose.yml down --remove-orphans'
+        sh 'docker-compose -f docker-compose.yml down --remove-orphans'
       }
     }
   }
