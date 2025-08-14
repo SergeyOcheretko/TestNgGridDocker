@@ -1,5 +1,4 @@
 
-
 services:
   selenium-hub:
     image: selenium/hub:4.12.1
@@ -54,6 +53,22 @@ services:
     networks:
       - selenium-grid
 
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    depends_on:
+      selenium-hub:
+        condition: service_healthy
+    networks:
+      - selenium-grid
+
 networks:
   selenium-grid:
     driver: bridge
+
+volumes:
+  jenkins_home:
