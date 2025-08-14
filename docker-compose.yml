@@ -1,3 +1,4 @@
+version: "3.8"
 
 services:
   selenium-hub:
@@ -72,3 +73,5 @@ networks:
 
 volumes:
   jenkins_home:
+    external: true
+    name: testnggriddocker_jenkins_home
