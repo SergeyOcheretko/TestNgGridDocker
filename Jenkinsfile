@@ -1,5 +1,8 @@
 pipeline {
-  agent any
+  agent {
+    label 'windows'
+  }
+
 
   environment {
     GRID_URL = "http://localhost:4444/wd/hub"
