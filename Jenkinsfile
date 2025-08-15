@@ -70,10 +70,14 @@ pipeline {
     }
   }
 
-  post {
-    always {
-      echo '📦 Archiving test results...'
-      junit '**/target/surefire-reports/*.xml'
-    }
-  }
+ post {
+   always {
+     echo '📦 Archiving test results...'
+     junit '**/target/surefire-reports/*.xml'
+
+     echo '📊 Generating Allure report...'
+     allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
+   }
+ }
+
 }
