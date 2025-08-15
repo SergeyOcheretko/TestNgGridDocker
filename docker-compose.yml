@@ -1,5 +1,4 @@
 
-
 services:
   selenium-hub:
     image: selenium/hub:4.12.1
