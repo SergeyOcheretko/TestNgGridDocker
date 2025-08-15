@@ -34,15 +34,18 @@ pipeline {
         bat 'powershell -Command "Start-Sleep -Seconds 40"'
 
         echo '🔍 Checking Grid status...'
-        bat '''
-          curl -s http://localhost:4444/status > grid-status.json
-          if ! grep -q '"ready": true' grid-status.json; then
-            echo "❌ Grid is not ready"
-            exit 1
-          else
-            echo "✅ Grid is ready"
-          fi
-        '''
+      bat '''
+      powershell -Command "
+        $status = Invoke-WebRequest -Uri http://localhost:4444/status -UseBasicParsing
+        $json = $status.Content | ConvertFrom-Json
+        if (-not $json.value.ready) {
+          Write-Host 'Grid is not ready yet.'
+          exit 1
+        } else {
+          Write-Host 'Grid is ready.'
+        }
+      "
+      '''
       }
     }
 
