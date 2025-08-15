@@ -31,7 +31,7 @@ pipeline {
         echo '🚀 Starting Selenium Grid via Docker Compose...'
         bat 'docker-compose -f docker-compose.yml up -d'
         echo '⏳ Waiting for node registration...'
-        bat 'sleep 40'
+        bat 'timeout /T 40 /NOBREAK'
 
         echo '🔍 Checking Grid status...'
         bat '''
