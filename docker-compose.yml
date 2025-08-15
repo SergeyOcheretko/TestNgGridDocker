@@ -1,4 +1,5 @@
 
+
 services:
   selenium-hub:
     image: selenium/hub:4.12.1
@@ -18,6 +19,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
     networks:
       - selenium-grid
 
@@ -33,7 +35,7 @@ services:
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_MAX_SESSIONS=1
-    restart: on-failure
+    restart: unless-stopped
     networks:
       - selenium-grid
 
@@ -49,7 +51,7 @@ services:
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
       - SE_NODE_MAX_SESSIONS=1
-    restart: on-failure
+    restart: unless-stopped
     networks:
       - selenium-grid
 
@@ -63,8 +65,18 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - jenkins_home:/var/jenkins_home
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
     depends_on:
       selenium-hub:
         condition: service_healthy
+    restart: unless-stopped
     networks:
       - selenium-grid
+
+volumes:
+  jenkins_home:
+
+networks:
+  selenium-grid:
+    driver: bridge

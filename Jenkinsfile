@@ -9,7 +9,7 @@ pipeline {
     stage('Force Kill Containers') {
       steps {
         echo '🔪 Killing stuck Selenium Grid containers...'
-        sh '''
+        bat '''
           docker kill chrome-node || echo "No chrome-node to kill"
           docker kill firefox-node || echo "No firefox-node to kill"
           docker rm -f chrome-node || echo "Removed chrome-node"
@@ -22,19 +22,19 @@ pipeline {
     stage('Clean Previous Containers') {
       steps {
         echo '🧹 Removing old Selenium Grid containers and network...'
-        sh 'docker-compose -f docker-compose.yml down --remove-orphans || true'
+        bat 'docker-compose -f docker-compose.yml down --remove-orphans || true'
       }
     }
 
     stage('Start Selenium Grid') {
       steps {
         echo '🚀 Starting Selenium Grid via Docker Compose...'
-        sh 'docker-compose -f docker-compose.yml up -d'
+        bat 'docker-compose -f docker-compose.yml up -d'
         echo '⏳ Waiting for node registration...'
-        sh 'sleep 40'
+        bat 'sleep 40'
 
         echo '🔍 Checking Grid status...'
-        sh '''
+        bat '''
           curl -s http://localhost:4444/status > grid-status.json
           if ! grep -q '"ready": true' grid-status.json; then
             echo "❌ Grid is not ready"
@@ -49,7 +49,7 @@ pipeline {
     stage('Run Tests') {
       steps {
         echo '🧪 Cleaning previous Allure results...'
-        sh '''
+        bat '''
           if [ -d allure-results ]; then
             rm -rf allure-results
           else
@@ -58,7 +58,7 @@ pipeline {
         '''
 
         echo '🧪 Running UI tests with Maven...'
-        sh 'mvn clean test -Dselenium.grid.url=$GRID_URL'
+        bat 'mvn clean test -Dselenium.grid.url=$GRID_URL'
       }
     }
 
@@ -72,7 +72,7 @@ pipeline {
     stage('Stop Selenium Grid') {
       steps {
         echo '🧹 Shutting down Selenium Grid...'
-        sh 'docker-compose -f docker-compose.yml down --remove-orphans'
+        bat 'docker-compose -f docker-compose.yml down --remove-orphans'
       }
     }
   }
